@@ -103,7 +103,8 @@ public class ClienteRestController {
 			List<String> errores = result.getFieldErrors().stream()
 					.map(error -> "El campo " + error.getField() + " " + error.getDefaultMessage())
 					.collect(Collectors.toList());
-
+			
+			System.out.println("-------"+response.toString());
 			response.put("errores", errores);
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
@@ -122,6 +123,7 @@ public class ClienteRestController {
 		} catch (DataAccessException e) {
 			response.put("mensaje", "Error al actualizar el cliente");
 			response.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+			System.out.println("-------"+response.toString());
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
