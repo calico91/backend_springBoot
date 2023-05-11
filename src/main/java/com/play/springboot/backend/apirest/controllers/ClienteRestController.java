@@ -1,5 +1,9 @@
 package com.play.springboot.backend.apirest.controllers;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +11,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -18,7 +24,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.play.springboot.backend.apirest.models.entity.Cliente;
 import com.play.springboot.backend.apirest.models.services.IClienteService;
@@ -36,6 +44,12 @@ public class ClienteRestController {
 	@GetMapping("/clientes")
 	public List<Cliente> index() {
 		return clienteService.findAll();
+	}
+
+	@GetMapping("/clientes/page/{page}")
+	public Page<Cliente> index(@PathVariable Integer page) {
+
+		return clienteService.findAllPage(PageRequest.of(page, 4));
 	}
 
 	@GetMapping("/clientes/{id}")
@@ -103,9 +117,9 @@ public class ClienteRestController {
 			List<String> errores = result.getFieldErrors().stream()
 					.map(error -> "El campo " + error.getField() + " " + error.getDefaultMessage())
 					.collect(Collectors.toList());
-			
-			System.out.println("-------"+response.toString());
+
 			response.put("errores", errores);
+			System.out.println("-------" + response);
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 
@@ -113,6 +127,10 @@ public class ClienteRestController {
 			response.put("mensaje",
 					"No se puede actualizar el cliente con ID:".concat(id.toString().concat(" no existe")));
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
+		}
+		if (id == 1) {
+			response.put("mensaje", "No se puede modificar esta sapa perra ");
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 
 		try {
@@ -123,7 +141,7 @@ public class ClienteRestController {
 		} catch (DataAccessException e) {
 			response.put("mensaje", "Error al actualizar el cliente");
 			response.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-			System.out.println("-------"+response.toString());
+			System.out.println("-------" + response.toString());
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
@@ -154,6 +172,30 @@ public class ClienteRestController {
 
 		response.put("mensaje", "Cliente eliminado");
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+	}
+
+	@PostMapping("/clientes/upload")
+	public ResponseEntity<?> upload(@RequestParam("archivo") MultipartFile archivo, @RequestParam("id") Long id) {
+
+		Map<String, Object> response = new HashMap<>();
+		Cliente cliente = clienteService.findById(id);
+
+		if (!archivo.isEmpty()) {
+			String nombreArchivo = archivo.getOriginalFilename();
+			Path rutaArchivo = Paths.get("uploads").resolve(nombreArchivo).toAbsolutePath();
+			try {
+				Files.copy(archivo.getInputStream(), rutaArchivo);
+			} catch (IOException e) {
+				response.put("mensaje", "Error al subir imagen el cliente" + nombreArchivo);
+				response.put("error", e.getMessage().concat(":").concat(e.getCause().getMessage()));
+				return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			cliente.setFoto(nombreArchivo);
+			clienteService.save(cliente);
+			response.put("cliente", cliente);
+			response.put("mensaje", "Has subido correctamente la imagen " + nombreArchivo);
+		}
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
 }
