@@ -3,20 +3,22 @@ package com.play.springboot.backend.apirest.models.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "clientes")
 public class Cliente implements Serializable {
@@ -44,78 +46,13 @@ public class Cliente implements Serializable {
 	@Temporal(TemporalType.DATE)
 	private Date createAt;
 
-	
 	private String foto;
-	
+
 	@PrePersist
 	public void prePersist() {
 		createAt = new Date();
 	}
 
-	
-	public Long getId() {
-		return id;
-	}
-
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-
-	public String getNombre() {
-		return nombre;
-	}
-
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-
-
-	public String getApellido() {
-		return apellido;
-	}
-
-
-	public void setApellido(String apellido) {
-		this.apellido = apellido;
-	}
-
-
-	public String getEmail() {
-		return email;
-	}
-
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-
-	public Date getCreateAt() {
-		return createAt;
-	}
-
-
-	public void setCreateAt(Date createAt) {
-		this.createAt = createAt;
-	}
-
-
-	public String getFoto() {
-		return foto;
-	}
-
-
-	public void setFoto(String foto) {
-		this.foto = foto;
-	}
-
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 }

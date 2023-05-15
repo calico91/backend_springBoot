@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +41,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.play.springboot.backend.apirest.models.entity.Cliente;
 import com.play.springboot.backend.apirest.models.services.IClienteService;
 
-import jakarta.validation.Valid;
+
+
 
 @CrossOrigin(origins = { "http://localhost:4200" })
 @RestController
